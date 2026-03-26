@@ -38,7 +38,7 @@ digraph project_planning {
     "Read 0-initial-req.md" -> "Requirement Inquiry";
     "Requirement Inquiry" -> "Assess Complexity" [shape=diamond];
 
-    "Assess Complexity" -> "High-level Architecture Design" [label="Threshold triggered"];
+    "Assess Complexity" -> "High-level Architecture Design" [label="Architecture Recommended"];
     "Assess Complexity" -> "Direct Epic Decomposition" [label="Below threshold"];
 
     "High-level Architecture Design" -> "Generate 0.5-high-level-arch.md";
@@ -63,12 +63,7 @@ digraph project_planning {
 
 如有任何一项不明确，**禁止**生成计划，必须先输出 Requirement Inquiry 列表。
 
-Read `0-initial-req.md` and identify:
-- Unclear requirements (contradictions, ambiguities, boundaries)
-- Missing information needed for planning
-- Technical constraints and assumptions
-
-**Ask clarifying questions one at a time** until requirements are clear enough for planning.
+> 详细执行过程参见 `project-planner-prompt.md` Step 1
 
 ### Phase 2: Architecture Signals Assessment
 
@@ -105,59 +100,41 @@ Create `0.5-high-level-arch.md` with:
 
 ### Phase 4: Epic Decomposition
 
-Break requirements into **Epics only** (NO task-level details):
-- Each Epic should deliver user-visible value
-- Epics can span multiple iterations
-- Prioritize: Critical > High > Medium > Low
-- **Epic granularity**: Feature-level, not implementation-level
+将需求分解为 **Epics only**（功能级别，非实现级别）：
+- 每个 Epic 交付用户可见价值
+- Epic 可跨越多个迭代
+- 优先级：关键 > 高 > 中 > 低
+- **Epic粒度**：功能级，非实现级
+
+> 详细执行过程参见 `project-planner-prompt.md` Step 3
 
 ### Phase 5: Iteration Planning (Rolling Wave)
 
-> **边界明确**：迭代规划**仅**将 Epic 分配到迭代，**不涉及**详细需求分解或 Task 级规划。
->
-> 每个迭代的详细执行计划（包括需求细化、验收标准、Task 分解）将在**迭代启动时**通过 brainstorming 技能生成。
+使用三级规划视野：
 
-Plan with three horizon levels:
+| 视野 | 详细程度 | 内容 |
+|:-----|:---------|:-----|
+| **Detailed** | Epic分配已确认 | 当前+下一迭代 |
+| **Outline** | Epic分配待定 | 未来2-3迭代 |
+| **Vision** | 主题级方向 | 更远迭代（仅主题）|
 
-| Horizon | Detail Level | Content |
-|---------|-------------|---------|
-| **Detailed** | Epic assignments confirmed | Current + next iteration (which Epics) |
-| **Outline** | Epic assignments tentative | Next 2-3 iterations (which Epics) |
-| **Vision** | Theme-level direction | Future iterations (themes only) |
+**边界明确**：迭代规划**仅**将 Epic 分配到迭代，**不涉及**详细需求分解或 Task 级规划。
 
-**Output `1-project-plan.md` iteration section format:**
-
-```markdown
-### 5.1 迭代1 - 详细规划
-**涉及Epic:** FR1, FR2
-**说明:** 详细执行计划在迭代启动时通过brainstorming生成
-
-### 5.2 迭代2 - 大纲规划
-**涉及Epic:** FR3
-
-### 5.3 迭代3+ - 愿景规划
-**主题:** 性能优化与扩展
-```
+> 详细执行过程参见 `project-planner-prompt.md` Step 4-5
 
 ---
 
 ## Rolling Wave Planning & Update Loop
 
-Project plan is **not frozen** - it evolves between iterations:
+项目计划**不是固定的**——它在迭代间演进：
 
-1. **Start**: Project plan only assigns Epics to iterations
-2. **Before each iteration**: Use brainstorming skill to:
-   - Select Epics assigned to this iteration
-   - Decompose into detailed requirements and Tasks
-   - Generate iteration specification
-3. **Between iterations**: Based on retrospective, adjust Epic assignments
-4. **Upgrade horizon**: As project progresses, outline → detailed, vision → outline
-5. **Iteration Checkpoint** (Critical): After each iteration completes:
-   - Re-activate project-planning skill
-   - Select next "outline" Epic to refine to "detailed"
-   - Update `1-project-plan.md` with new insights
+1. **启动**：项目计划仅将 Epic 分配到迭代
+2. **迭代前**：使用 brainstorming 技能将 Epic 分解为详细需求和 Tasks
+3. **迭代间**：基于复盘调整 Epic 分配
+4. **视野升级**：outline → detailed, vision → outline
+5. **迭代检查点**：每个迭代结束后，重新激活 project-planning skill，将下一个 outline Epic 细化为 detailed
 
-Document all changes in `1-project-plan.md` version history.
+所有变更记录在 `1-project-plan.md` 版本历史中。
 
 ---
 
@@ -319,31 +296,11 @@ planning_horizon:
 ### 5.3 迭代4+ - 愿景规划
 **范围：** 主题级描述
 
-## 6 迭代检查点 (Iteration Checkpoint)
-
-**滚动计划闭环流程**：
-
-每个迭代结束后，必须执行以下步骤：
-
-1. **复盘当前迭代**
-   - 完成情况 vs 计划
-   - 发现的风险/问题
-   - 技术债务记录
-
-2. **更新项目计划**
-   - 重新激活 project-planning skill
-   - 选择下一个 "outline" 状态的 Epic
-   - 将其细化为 "detailed" 状态
-   - 更新版本号和日期
-
-3. **准备下一迭代**
-   - 明确下一迭代的Epic范围
-   - 识别依赖和风险
-   - 更新本章节记录
+## 6 迭代检查点记录
 
 | 检查点 | 日期 | 处理的Epic | 计划版本 | 备注 |
 |:---:|:---:|:---:|:---:|:---|
-| CP-1 | 2026-04-09 | FR2 | 1.b | 从outline转为detailed |
+| CP-1 | YYYY-MM-DD | FR2 | 1.b | 从outline转为detailed |
 
 ## 7 技术架构
 - **高阶架构**: `0.5-high-level-arch_YYYYMMDD_vX.Y.md`
