@@ -80,18 +80,22 @@ Generate `1-project-plan.md` content with **Epic-level roadmap only**.
 - Priorities, constraints, timeline
 - Dependencies between requirements
 
-### Step 2: Quantitative Complexity Assessment
+### Step 2: Architecture Signals Assessment
 
-评估是否满足架构文档触发阈值：
+评估项目复杂性，判断是否需要架构设计：
 
-| 量化指标 | 阈值 | 当前评估 |
-|:---------|:-----|:---------|
-| 内部组件/服务交互 | ≥ 3个 | 计数: __ |
-| 外部API/系统集成 | ≥ 2个 | 计数: __ |
-| 预估代码量 | ≥ 5000行 | 估算: __ |
-| 新系统/平台 | 是/否 | 判断: __ |
+| 架构信号 | 评估问题 | 评估 |
+|:---------|:---------|:----:|
+| **数据流复杂度** | 数据是否在多组件间多方向流动？是否有复杂的转换链路？ | 高/中/低 |
+| **状态管理难度** | 状态是否在多阶段变化？是否有跨组件状态同步？ | 高/中/低 |
+| **性能敏感度** | 性能是否是核心约束？是否有严格的延迟/吞吐要求？ | 是/否 |
+| **扩展不确定性** | 未来功能扩展方向是否不明确？架构需要预留多少灵活性？ | 高/中/低 |
 
-**如果任一条件满足 → 设置 needs_architecture = true**
+**决策**：
+- 任一信号为"高" 或 性能敏感度为"是" → **建议**生成 `0.5-high-level-arch.md`
+- 所有信号为"低" 且 性能不敏感 → **不建议**架构设计（YAGNI）
+
+> 注：若建议生成架构文档，可通过 `superpowers:brainstorming` 进行架构决策探索。
 
 ### Step 3: Epic Decomposition (NOT Task Decomposition)
 
@@ -164,7 +168,7 @@ Then markdown content with sections:
 
 1. **Inquiry First**: If requirements unclear, STOP and output Requirement Inquiry list
 2. **Boundary**: Epic planning only; NEVER output task-level implementation steps
-3. **Quantitative Thresholds**: Use objective metrics (3+ components, 2+ APIs, 5000+ LOC)
+3. **Architecture Signals**: Use complexity judgment (data flow, state, performance, extensibility), not rigid metrics
 4. **Epic Granularity**: Feature-level, spans iterations, no implementation details
 5. **Update Loop**: Include Iteration Checkpoint procedure
 6. **All dates in YYYY-MM-DD format**
