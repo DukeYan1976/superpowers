@@ -83,6 +83,13 @@ Break requirements into Epics:
 
 ### Phase 5: Iteration Planning (Rolling Wave)
 
+> **Note on Progressive Elaboration**: The iteration roadmap below is a **preliminary suggestion** based on current understanding. Only the current iteration is fully detailed and committed. Subsequent iterations will emerge and clarify progressively through:
+> - Retrospectives and learnings from completed iterations
+> - Evolving understanding of requirements and technical challenges
+> - Adaptation to changing priorities or constraints
+>
+> This embodies the agile principle of **emergent planning** - we maintain a clear direction while embracing the reality that distant details are inherently uncertain.
+
 Plan with three horizon levels:
 
 | Horizon | Detail Level | Content |
@@ -249,5 +256,7 @@ planning_horizon:
 
 - **YAGNI**: Don't over-plan distant iterations
 - **Incremental**: Plan just enough for next iteration to start
+- **Emergent Clarity**: Iteration plans are preliminary; only current iteration is fully defined
+- **Progressive Elaboration**: Distant iterations clarify as we learn from each cycle
 - **Adaptable**: Update plan based on retrospective learnings
 - **Traceable**: Link Epics back to initial requirements
