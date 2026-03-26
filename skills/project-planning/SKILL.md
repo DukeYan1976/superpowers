@@ -30,10 +30,10 @@ digraph project_planning {
     "Read 0-initial-req.md" -> "Requirement Inquiry";
     "Requirement Inquiry" -> "Assess Complexity" [shape=diamond];
 
-    "Assess Complexity" -> "High-level Architecture Design" [label="Complex project"];
+    "Assess Complexity" -> "Architecture Brainstorming" [label="Complex project"];
     "Assess Complexity" -> "Direct Epic Decomposition" [label="Simple project"];
 
-    "High-level Architecture Design" -> "Generate 0.5-high-level-arch.md";
+    "Architecture Brainstorming" -> "Generate 0.5-high-level-arch.md";
     "Generate 0.5-high-level-arch.md" -> "Epic Decomposition";
     "Direct Epic Decomposition" -> "Epic Decomposition";
 
@@ -64,15 +64,37 @@ Determine if high-level architecture is needed:
 | Simple feature enhancement | No |
 | Single-file utility | No |
 
-### Phase 3: High-level Architecture (if needed)
+### Phase 3: Architecture Brainstorming & Vision (if needed)
 
-Create `0.5-high-level-arch.md` with:
-- Architecture vision and key capabilities
-- Component diagram (C4 Container level)
-- Component responsibilities and interfaces
-- Data flow for main use cases
-- Technology choices (with rationale)
-- Evolution roadmap (which parts are detailed/outline/vision)
+对于需要架构文档的复杂项目，使用`superpowers:brainstorming`进行**轻量级架构brainstorming**：
+
+**Announce:** "Using superpowers:brainstorming to explore architecture decisions before creating the high-level vision."
+
+**Brainstorming Focus (2-3个关键决策):**
+1. **识别关键架构问题**（不超过3个）
+   - 例："单体 vs 微服务"、"核心数据结构选择"、"关键接口边界"
+
+2. **快速方案探索**（每个问题2个可行方案）
+   - 方案A：简洁实现，快速交付
+   - 方案B：考虑扩展，适度抽象
+
+3. **权衡与决策**
+   - 基于项目约束做出选择
+   - 记录决策理由（简洁即可）
+
+**Output: 简洁的架构愿景文档** `0.5-high-level-arch.md`：
+- 不超过2页
+- 聚焦：关键决策、组件边界、扩展策略
+- **不包含**：详细接口、完整数据流、实现细节
+
+**架构愿景模板:**
+```markdown
+## 1. 架构愿景（1段话）
+## 2. 关键决策（2-3个决策点 + 选择理由）
+## 3. 组件边界（简化的C4 Container，仅核心组件）
+## 4. 扩展策略（预留的扩展点）
+## 5. 演进路线（与project-plan迭代对齐）
+```
 
 ### Phase 4: Epic Decomposition
 
@@ -126,13 +148,20 @@ Document changes in `1-project-plan.md` version history.
 ## Integration with Other Skills
 
 **Downstream skills:**
-- `superpowers:brainstorming` - Used per-Epic during iteration cycle for detailed design
+- `superpowers:brainstorming` - **Two-phase usage:**
+  1. **Project planning phase**: Architecture decision exploration (if high-level arch needed)
+  2. **Iteration phase**: Per-Epic detailed design
 - `superpowers:writing-plans` - Creates implementation plan from Epic design
 - `superpowers:subagent-driven-development` - Executes the plan
 
 **Workflow sequence:**
 ```
 project-planning (project level)
+    |
+    ├─→ brainstorming (architecture decisions, if needed) → 0.5-high-level-arch.md
+    |
+    v
+Epic Decomposition → 1-project-plan.md
     |
     v
 brainstorming (per-Epic detailed design)
@@ -176,6 +205,8 @@ company: {name: "{{COMPANY_NAME}}", short: "{{COMPANY_SHORT}}"}
 
 ### 0.5-high-level-arch.md Output Format
 
+> **精简原则**：架构愿景不超过2页，聚焦关键决策和组件边界
+
 ```yaml
 ---
 doc_id: "ATF-ARCH-001"
@@ -192,25 +223,34 @@ scope:
 # 高阶架构设计
 
 ## 1. 架构愿景
-...
+1段话描述系统核心定位和目标
 
-## 2. 总体架构图
-...
+## 2. 关键决策
+| 决策点 | 选择 | 理由 |
+|:-------|:-----|:-----|
+| 架构风格 | 单体/微服务/... | 为什么 |
+| 核心数据模型 | 关系型/文档/... | 为什么 |
+| 扩展机制 | 插件/配置/... | 为什么 |
 
-## 3. 核心组件
-...
+## 3. 组件边界 (C4 Container)
+```mermaid
+C4Container
+    title 系统容器图
+    Container_Boundary(b1, "核心系统") {
+        Container(c1, "组件1", "Tech", "职责")
+    }
+    ContainerDb(db, "数据库", "Tech", "用途")
+```
 
-## 4. 数据流
-...
+## 4. 扩展策略
+- 预留的扩展点1：...（计划迭代N实现）
+- 预留的扩展点2：...（计划迭代N+1实现）
 
-## 5. 技术选型
-...
-
-## 6. 演进路线
-| 迭代 | 架构细化范围 |
+## 5. 演进路线
+| 迭代 | 架构焦点 |
 |:---:|:---|
-| 迭代1 | 核心引擎模块 |
-| 迭代2 | 插件加载机制 |
+| 迭代1 | 核心引擎 |
+| 迭代2 | 插件机制 |
 ```
 
 ### 1-project-plan.md Output Format
