@@ -1,25 +1,33 @@
 ---
 name: project-planning
-description: Use when transforming initial requirements into a project plan with optional high-level architecture, supporting rolling wave planning for iterative development
+description: Use when transforming initial requirements into an Epic-level roadmap with optional high-level architecture. Outputs 1-project-plan.md (Epics only) and optionally 0.5-high-level-arch.md. Task-level implementation planning is STRICTLY delegated to downstream writing-plans skill.
 ---
 
 # Project Planning
 
+## 职能边界明确
+
+**核心原则**：本技能仅产出 **Epic级别的项目路线图**，**严禁**产出Task级代码实现步骤。
+
+- **本技能负责**：Epic分解、迭代分配、路线图规划
+- **下游技能负责**：Task级实现步骤、代码规划 (writing-plans)
+
 ## Overview
 
-Transform `0-initial-req.md` into `1-project-plan.md` with optional `0.5-high-level-arch.md` for complex projects.
-
-**Announce at start:** "I'm using the project-planning skill to create a project plan from your initial requirements."
+**Announce at start:** "I'm using the project-planning skill to create an Epic-level roadmap from your initial requirements. Task-level planning will be handled by writing-plans skill during iteration execution."
 
 **Input:** `0-initial-req_YYYYMMDD_v{X}.{Y}.md` (customer requirements)
 **Outputs:**
-- `0.5-high-level-arch_YYYYMMDD_v{X}.{Y}.md` (optional, for complex projects)
-- `1-project-plan_YYYYMMDD_v{X}.{Y}.md` (project plan with epics and iteration roadmap)
+- `0.5-high-level-arch_YYYYMMDD_v{X}.{Y}.md` (optional, triggered by quantitative thresholds)
+- `1-project-plan_YYYYMMDD_v{X}.{Y}.md` (Epic-level roadmap with iteration assignments)
 
 **Key Concepts:**
 - **Rolling Wave Planning**: Project plan evolves iteratively - only immediate iterations need detailed planning
 - **Planning Horizon**: detailed (current+1 iteration) / outline (next 2-3) / vision (future)
-- **Epic**: Large requirement that may span multiple iterations
+- **Epic**: Large requirement that may span multiple iterations. **NOT** task-level implementation steps.
+- **Boundary**: Epic planning (this skill) → Task planning (writing-plans skill)
+
+---
 
 ## The Process
 
@@ -30,20 +38,30 @@ digraph project_planning {
     "Read 0-initial-req.md" -> "Requirement Inquiry";
     "Requirement Inquiry" -> "Assess Complexity" [shape=diamond];
 
-    "Assess Complexity" -> "Architecture Brainstorming" [label="Complex project"];
-    "Assess Complexity" -> "Direct Epic Decomposition" [label="Simple project"];
+    "Assess Complexity" -> "High-level Architecture Design" [label="Threshold triggered"];
+    "Assess Complexity" -> "Direct Epic Decomposition" [label="Below threshold"];
 
-    "Architecture Brainstorming" -> "Generate 0.5-high-level-arch.md";
+    "High-level Architecture Design" -> "Generate 0.5-high-level-arch.md";
     "Generate 0.5-high-level-arch.md" -> "Epic Decomposition";
     "Direct Epic Decomposition" -> "Epic Decomposition";
 
     "Epic Decomposition" -> "Iteration Planning";
     "Iteration Planning" -> "Generate 1-project-plan.md";
     "Generate 1-project-plan.md" -> "Ready for Iteration Cycle" [style=dashed];
+
+    "Iteration Execution" -> "Iteration Checkpoint" [style=dashed];
+    "Iteration Checkpoint" -> "Epic Decomposition" [label="Refine next Outline Epic"];
 }
 ```
 
-### Phase 1: Requirements Clarification
+### Phase 1: Requirements Clarification (Mandatory)
+
+**硬性约束（Inquiry First）**：在继续之前，必须确认以下要素已明确：
+- ✅ 核心业务逻辑清晰（输入→处理→输出）
+- ✅ 关键性能指标已定义（延迟、吞吐量、精度等）
+- ✅ 集成边界明确（与哪些系统交互，接口协议）
+
+如有任何一项不明确，**禁止**生成计划，必须先输出 Requirement Inquiry 列表。
 
 Read `0-initial-req.md` and identify:
 - Unclear requirements (contradictions, ambiguities, boundaries)
@@ -52,56 +70,36 @@ Read `0-initial-req.md` and identify:
 
 **Ask clarifying questions one at a time** until requirements are clear enough for planning.
 
-### Phase 2: Complexity Assessment
+### Phase 2: Complexity Assessment (Quantitative Thresholds)
 
-Determine if high-level architecture is needed:
+**量化架构触发阈值** - 满足任一条件必须生成架构文档：
 
-| Condition | Needs Architecture Document |
-|-----------|----------------------------|
-| New system/platform | Yes |
-| 3+ interacting components/services | Yes |
-| Critical technology decisions | Yes |
-| Simple feature enhancement | No |
-| Single-file utility | No |
+| 量化指标 | 阈值 | 强制架构 |
+|:---------|:-----|:---------:|
+| 内部组件/服务交互 | ≥ 3个 | ✅ 是 |
+| 外部API/系统集成 | ≥ 2个 | ✅ 是 |
+| 预估代码量 | ≥ 5000行 | ✅ 是 |
+| 新系统/平台 | 无现有架构可参考 | ✅ 是 |
+| 简单功能增强 | < 以上所有阈值 | ❌ 否 |
+| 单文件工具 | < 以上所有阈值 | ❌ 否 |
 
-### Phase 3: Architecture Brainstorming & Vision (if needed)
+### Phase 3: High-level Architecture (if triggered)
 
-对于需要架构文档的复杂项目，使用`superpowers:brainstorming`进行**轻量级架构brainstorming**：
-
-**Announce:** "Using superpowers:brainstorming to explore architecture decisions before creating the high-level vision."
-
-**Brainstorming Focus (2-3个关键决策):**
-1. **识别关键架构问题**（不超过3个）
-   - 例："单体 vs 微服务"、"核心数据结构选择"、"关键接口边界"
-
-2. **快速方案探索**（每个问题2个可行方案）
-   - 方案A：简洁实现，快速交付
-   - 方案B：考虑扩展，适度抽象
-
-3. **权衡与决策**
-   - 基于项目约束做出选择
-   - 记录决策理由（简洁即可）
-
-**Output: 简洁的架构愿景文档** `0.5-high-level-arch.md`：
-- 不超过2页
-- 聚焦：关键决策、组件边界、扩展策略
-- **不包含**：详细接口、完整数据流、实现细节
-
-**架构愿景模板:**
-```markdown
-## 1. 架构愿景（1段话）
-## 2. 关键决策（2-3个决策点 + 选择理由）
-## 3. 组件边界（简化的C4 Container，仅核心组件）
-## 4. 扩展策略（预留的扩展点）
-## 5. 演进路线（与project-plan迭代对齐）
-```
+Create `0.5-high-level-arch.md` with:
+- Architecture vision and key capabilities
+- **Mermaid C4 Container diagram** (standardized syntax)
+- Component responsibilities and interfaces (abstract only)
+- Data flow for main use cases
+- Technology choices (with rationale)
+- **Mermaid evolution roadmap diagram**
 
 ### Phase 4: Epic Decomposition
 
-Break requirements into Epics:
+Break requirements into **Epics only** (NO task-level details):
 - Each Epic should deliver user-visible value
 - Epics can span multiple iterations
 - Prioritize: Critical > High > Medium > Low
+- **Epic granularity**: Feature-level, not implementation-level
 
 ### Phase 5: Iteration Planning (Rolling Wave)
 
@@ -131,7 +129,9 @@ Plan with three horizon levels:
 **主题:** 性能优化与扩展
 ```
 
-## Rolling Wave Planning
+---
+
+## Rolling Wave Planning & Update Loop
 
 Project plan is **not frozen** - it evolves between iterations:
 
@@ -142,39 +142,44 @@ Project plan is **not frozen** - it evolves between iterations:
    - Generate iteration specification
 3. **Between iterations**: Based on retrospective, adjust Epic assignments
 4. **Upgrade horizon**: As project progresses, outline → detailed, vision → outline
+5. **Iteration Checkpoint** (Critical): After each iteration completes:
+   - Re-activate project-planning skill
+   - Select next "outline" Epic to refine to "detailed"
+   - Update `1-project-plan.md` with new insights
 
-Document changes in `1-project-plan.md` version history.
+Document all changes in `1-project-plan.md` version history.
+
+---
 
 ## Integration with Other Skills
 
+**职能边界明确**：
+
+| 层级 | 本技能 (project-planning) | 下游技能 (writing-plans) |
+|:-----|:--------------------------|:-------------------------|
+| **输出** | Epic路线图、迭代分配 | Task级实现步骤、代码规划 |
+| **粒度** | Feature-level | Implementation-level |
+| **时机** | 项目启动、迭代Checkpoint | 迭代内执行前 |
+
 **Downstream skills:**
-- `superpowers:brainstorming` - **Two-phase usage:**
-  1. **Project planning phase**: Architecture decision exploration (if high-level arch needed)
-  2. **Iteration phase**: Per-Epic detailed design
-- `superpowers:writing-plans` - Creates implementation plan from Epic design
+- `superpowers:brainstorming` - Used per-Epic during iteration cycle for detailed design
+- `superpowers:writing-plans` - **Creates task-level implementation plan from Epic** (NEVER done by this skill)
 - `superpowers:subagent-driven-development` - Executes the plan
 
 **Workflow sequence:**
 ```
-project-planning (project level)
-    |
-    ├─→ brainstorming (architecture decisions, if needed) → 0.5-high-level-arch.md
-    |
-    v
-Epic Decomposition → 1-project-plan.md
-    |
-    v
+project-planning (project level - Epic roadmap)
+    ↓
 brainstorming (per-Epic detailed design)
-    |
-    v
-writing-plans (implementation plan)
-    |
-    v
+    ↓
+writing-plans (task-level implementation plan) ← NOT in this skill
+    ↓
 subagent-driven-development (execution)
-    |
-    v
-[Retrospective] -> [Update project-plan] -> [Next iteration]
+    ↓
+[Retrospective] → [Iteration Checkpoint] → [Re-activate project-planning] → [Next iteration]
 ```
+
+---
 
 ## Document Formats
 
@@ -205,8 +210,6 @@ company: {name: "{{COMPANY_NAME}}", short: "{{COMPANY_SHORT}}"}
 
 ### 0.5-high-level-arch.md Output Format
 
-> **精简原则**：架构愿景不超过2页，聚焦关键决策和组件边界
-
 ```yaml
 ---
 doc_id: "ATF-ARCH-001"
@@ -223,34 +226,42 @@ scope:
 # 高阶架构设计
 
 ## 1. 架构愿景
-1段话描述系统核心定位和目标
+...
 
-## 2. 关键决策
-| 决策点 | 选择 | 理由 |
-|:-------|:-----|:-----|
-| 架构风格 | 单体/微服务/... | 为什么 |
-| 核心数据模型 | 关系型/文档/... | 为什么 |
-| 扩展机制 | 插件/配置/... | 为什么 |
+## 2. 总体架构图 (C4 Container)
 
-## 3. 组件边界 (C4 Container)
 ```mermaid
 C4Container
-    title 系统容器图
-    Container_Boundary(b1, "核心系统") {
-        Container(c1, "组件1", "Tech", "职责")
+    title System Container Diagram
+    Container_Boundary(c1, "核心系统") {
+        Container(app, "应用服务", "Technology", "描述")
+        Container(db, "数据库", "Technology", "描述")
     }
-    ContainerDb(db, "数据库", "Tech", "用途")
+    System_Ext(ext, "外部系统")
+    Rel(app, db, "读写数据")
+    Rel(app, ext, "调用API")
 ```
 
-## 4. 扩展策略
-- 预留的扩展点1：...（计划迭代N实现）
-- 预留的扩展点2：...（计划迭代N+1实现）
+## 3. 核心组件
+...
 
-## 5. 演进路线
-| 迭代 | 架构焦点 |
-|:---:|:---|
-| 迭代1 | 核心引擎 |
-| 迭代2 | 插件机制 |
+## 4. 数据流
+...
+
+## 5. 技术选型
+...
+
+## 6. 演进路线图
+
+```mermaid
+gantt
+    title 架构演进路线图
+    dateFormat  YYYY-MM-DD
+    section 迭代1
+    核心引擎      :done, iter1, 2026-03-26, 14d
+    section 迭代2
+    插件机制      :active, iter2, after iter1, 14d
+```
 ```
 
 ### 1-project-plan.md Output Format
@@ -287,26 +298,56 @@ planning_horizon:
 | FR2 | 用户界面 | ... | 高 | outline | 迭代3-4 |
 
 ## 5 迭代规划
+
 ### 5.1 迭代1 - 详细规划
-...
+**范围：** Epic FR1
+**交付标准：** [验收标准，非实现步骤]
 
 ### 5.2 迭代2-3 - 大纲规划
-...
+**范围：** Epics FR2, FR3
 
 ### 5.3 迭代4+ - 愿景规划
-...
+**范围：** 主题级描述
 
-## 6 技术架构
+## 6 迭代检查点 (Iteration Checkpoint)
+
+**滚动计划闭环流程**：
+
+每个迭代结束后，必须执行以下步骤：
+
+1. **复盘当前迭代**
+   - 完成情况 vs 计划
+   - 发现的风险/问题
+   - 技术债务记录
+
+2. **更新项目计划**
+   - 重新激活 project-planning skill
+   - 选择下一个 "outline" 状态的 Epic
+   - 将其细化为 "detailed" 状态
+   - 更新版本号和日期
+
+3. **准备下一迭代**
+   - 明确下一迭代的Epic范围
+   - 识别依赖和风险
+   - 更新本章节记录
+
+| 检查点 | 日期 | 处理的Epic | 计划版本 | 备注 |
+|:---:|:---:|:---:|:---:|:---|
+| CP-1 | 2026-04-09 | FR2 | 1.b | 从outline转为detailed |
+
+## 7 技术架构
 - **高阶架构**: `0.5-high-level-arch_YYYYMMDD_vX.Y.md`
 - **架构状态**: evolving
 ```
 
+---
+
 ## Key Principles
 
+- **Boundary**: This skill = Epic roadmap only; Task planning = writing-plans skill
 - **YAGNI**: Don't over-plan distant iterations
-- **Boundary**: This skill = Epic-to-iteration assignment only; Detailed planning = brainstorming skill at iteration start
-- **Incremental**: Project plan just assigns Epics; Details emerge during iteration
-- **Emergent Clarity**: Only current iteration Epic assignment is firm; future assignments are tentative
-- **Progressive Elaboration**: Detailed requirements and Tasks emerge through brainstorming per-iteration
-- **Adaptable**: Update plan based on retrospective learnings
+- **Incremental**: Plan just enough for next iteration to start
+- **Emergent Clarity**: Iteration plans are preliminary; only current iteration is fully defined
+- **Progressive Elaboration**: Distant iterations clarify as we learn from each cycle
+- **Update Loop**: Mandatory Iteration Checkpoint after each iteration
 - **Traceable**: Link Epics back to initial requirements
