@@ -83,34 +83,43 @@ Break requirements into Epics:
 
 ### Phase 5: Iteration Planning (Rolling Wave)
 
-> **Note on Progressive Elaboration**: The iteration roadmap below is a **preliminary suggestion** based on current understanding. Only the current iteration is fully detailed and committed. Subsequent iterations will emerge and clarify progressively through:
-> - Retrospectives and learnings from completed iterations
-> - Evolving understanding of requirements and technical challenges
-> - Adaptation to changing priorities or constraints
+> **边界明确**：迭代规划**仅**将 Epic 分配到迭代，**不涉及**详细需求分解或 Task 级规划。
 >
-> This embodies the agile principle of **emergent planning** - we maintain a clear direction while embracing the reality that distant details are inherently uncertain.
+> 每个迭代的详细执行计划（包括需求细化、验收标准、Task 分解）将在**迭代启动时**通过 brainstorming 技能生成。
 
 Plan with three horizon levels:
 
 | Horizon | Detail Level | Content |
 |---------|-------------|---------|
-| **Detailed** | Task-level | Current + next iteration |
-| **Outline** | Epic-level | Next 2-3 iterations |
-| **Vision** | Theme-level | Future iterations |
+| **Detailed** | Epic assignments confirmed | Current + next iteration (which Epics) |
+| **Outline** | Epic assignments tentative | Next 2-3 iterations (which Epics) |
+| **Vision** | Theme-level direction | Future iterations (themes only) |
 
-Output `1-project-plan.md` with:
-- Project team and background
-- Epic list with priorities and horizon status
-- Iteration roadmap
-- Architecture reference (if exists)
+**Output `1-project-plan.md` iteration section format:**
+
+```markdown
+### 5.1 迭代1 - 详细规划
+**涉及Epic:** FR1, FR2
+**说明:** 详细执行计划在迭代启动时通过brainstorming生成
+
+### 5.2 迭代2 - 大纲规划
+**涉及Epic:** FR3
+
+### 5.3 迭代3+ - 愿景规划
+**主题:** 性能优化与扩展
+```
 
 ## Rolling Wave Planning
 
 Project plan is **not frozen** - it evolves between iterations:
 
-1. **Start**: Only Iteration 1 needs detailed planning
-2. **Between iterations**: Based on retrospective, refine next iteration's plan
-3. **Upgrade horizon**: As project progresses, outline -> detailed, vision -> outline
+1. **Start**: Project plan only assigns Epics to iterations
+2. **Before each iteration**: Use brainstorming skill to:
+   - Select Epics assigned to this iteration
+   - Decompose into detailed requirements and Tasks
+   - Generate iteration specification
+3. **Between iterations**: Based on retrospective, adjust Epic assignments
+4. **Upgrade horizon**: As project progresses, outline → detailed, vision → outline
 
 Document changes in `1-project-plan.md` version history.
 
@@ -255,8 +264,9 @@ planning_horizon:
 ## Key Principles
 
 - **YAGNI**: Don't over-plan distant iterations
-- **Incremental**: Plan just enough for next iteration to start
-- **Emergent Clarity**: Iteration plans are preliminary; only current iteration is fully defined
-- **Progressive Elaboration**: Distant iterations clarify as we learn from each cycle
+- **Boundary**: This skill = Epic-to-iteration assignment only; Detailed planning = brainstorming skill at iteration start
+- **Incremental**: Project plan just assigns Epics; Details emerge during iteration
+- **Emergent Clarity**: Only current iteration Epic assignment is firm; future assignments are tentative
+- **Progressive Elaboration**: Detailed requirements and Tasks emerge through brainstorming per-iteration
 - **Adaptable**: Update plan based on retrospective learnings
 - **Traceable**: Link Epics back to initial requirements

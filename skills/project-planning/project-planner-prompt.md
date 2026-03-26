@@ -31,11 +31,12 @@ Generate `1-project-plan.md` content.
    - Near future (3-5): outline
    - Distant: vision only
 
-4. **Create Iteration Roadmap**
-   - Assign Epics to iterations
-   - Balance workload across iterations
-   - Consider dependencies and priorities
-   - First iteration must have task-level detail
+4. **Create Iteration Roadmap (Milestone Assignment Only)**
+   - **仅**将 Epic 分配到迭代（里程碑级别）
+   - 不涉及详细需求分解、验收标准制定或 Task 规划
+   - 平衡各迭代的工作负载
+   - 考虑 Epic 依赖关系和优先级
+   - 输出格式：`迭代N: 涉及 Epic FR1, FR2`
 
 5. **Structure Output**
    - Follow YAML frontmatter format
@@ -64,9 +65,12 @@ Then markdown content with sections:
 2. 项目背景介绍
 3. 项目价值
 4. 计划需求列表 (Epics table)
-5. 迭代规划 (detailed/outline/vision)
+5. 迭代规划 (仅 Epic 分配，无详细需求)
+   - 格式: `**涉及Epic:** FR1, FR2` (或 FR3 或 "性能优化主题")
 6. 技术架构 (reference to arch doc)
 7. 复盘与计划调整记录 (empty table for future use)
+
+**重要边界**: 迭代规划中严禁出现详细需求分解、Task列表或验收标准。这些在迭代启动时通过 brainstorming 生成。
 
 ## Rules
 
